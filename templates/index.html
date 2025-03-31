@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ask the AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f6ff;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      color: #0056b3;
+      margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 400px;
+      border: 2px solid #0056b3;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #response {
+      margin-top: 40px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #007bff;
+      border-radius: 50%;
+      border-top: 4px solid transparent;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script>
+    async function submitQuery(event) {
+      event.preventDefault();
+
+      const responseDiv = document.getElementById('response');
+      responseDiv.innerHTML = `
+        <div class="spinner"></div>
+        <p style="color:#007bff;">Thinking...</p>
+      `;
+
+      const formData = new FormData(document.getElementById('queryForm'));
+
+      try {
+        const response = await fetch('/query', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        responseDiv.innerHTML = `
+          <h3 style="color:#0056b3;">Query:</h3>
+          <p>${result.query}</p>
+          <h3 style="color:#0056b3;">Answer:</h3>
+          <p>${result.response}</p>
+        `;
+      } catch (error) {
+        responseDiv.innerHTML = `<p style="color:red;">An error occurred: ${error.message}</p>`;
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Ask a Question</h1>
+  <form id="queryForm" onsubmit="submitQuery(event)">
+    <input type="text" name="query" placeholder="Type your question here..." required />
+    <button type="submit">Ask</button>
+  </form>
+  <div id="response"></div>
+</body>
+</html>
